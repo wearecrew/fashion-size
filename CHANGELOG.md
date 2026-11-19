@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Dune London's adult shoe charts cover shoes, boots, and trainers. Dune publishes one footwear table (men's UK 6 = EU 40, women's UK 7 = EU 40), so a trainer or boot uses that chart instead of the default shoe chart. Other brands' shoe charts stay shoes-only.
+
 ## 2026.11.13.1
 
 - `hem-length` formula length size type for fitted-dress hem measurements (`in-hem-length` / `cm-hem-length`, attribute slug `dress-length` also resolves). Bounds 20–42 in; distinct from `trousers-inseam` for the dresses family.

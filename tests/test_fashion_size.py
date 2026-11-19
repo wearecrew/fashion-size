@@ -124,7 +124,25 @@ def test_readme_brand_chart_example():
     assert "AU values match US" in mens.source_notes
     assert {"uk": 7, "eu": 40, "us": 9, "au": 9} in chart.rows
     assert chart.covers(ProductType.SHOES)
+    assert chart.covers(ProductType.BOOTS)
+    assert chart.covers(ProductType.TRAINERS)
     assert not chart.covers(ProductType.JEANS)
+    trainers = chart_for(
+        "Dune London",
+        "adult-shoe",
+        "adult",
+        "male",
+        product_type=ProductType.TRAINERS,
+    )
+    boots = chart_for(
+        "Dune London",
+        "adult-shoe",
+        "adult",
+        "female",
+        product_type=ProductType.BOOTS,
+    )
+    assert trainers is mens
+    assert boots is chart
 
 
 def test_readme_dress_conversion():
@@ -744,6 +762,37 @@ def test_brand_name_selects_the_shipped_chart():
     assert dune.source.kind == ConversionSourceKind.BRAND
     assert dune.source.brand_chart is not None
     assert dune.source.brand_chart.brand_name == BrandName.DUNE_LONDON
+    # Dune's one footwear table also governs boots and trainers.
+    men = Demographic("adult", "male")
+    for product_type in (ProductType.SHOES, ProductType.BOOTS, ProductType.TRAINERS):
+        mens_eu = Size.from_raw(6, UK_ADULT_SHOE_SIZE).convert_to_locale(
+            "eu",
+            demographic=men,
+            brand_name="Dune London",
+            product_type=product_type,
+        )
+        assert mens_eu.raw == 40
+        assert mens_eu.source.kind == ConversionSourceKind.BRAND
+        womens_uk = Size.from_raw(40, EU_ADULT_SHOE_SIZE).convert_to_locale(
+            "uk",
+            demographic=adult_female,
+            brand_name="Dune London",
+            product_type=product_type,
+        )
+        assert womens_uk.raw == 7
+        assert womens_uk.source.kind == ConversionSourceKind.BRAND
+    default_trainer = Size.from_raw(40, EU_ADULT_SHOE_SIZE).convert_to_locale(
+        "uk", demographic=men
+    )
+    assert default_trainer.raw == Decimal("6.5")
+    shoes_only = Size.from_raw(6, UK_ADULT_SHOE_SIZE).convert_to_locale(
+        "eu",
+        demographic=men,
+        brand_name="Mallet",
+        product_type=ProductType.TRAINERS,
+    )
+    assert shoes_only.source.kind == ConversionSourceKind.DEFAULT
+    assert shoes_only.source.default_reason == DefaultChartReason.NO_MATCHING_CHART
 
     anthropologie = shoe.convert_to_locale(
         "eu",
