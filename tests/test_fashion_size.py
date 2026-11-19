@@ -103,7 +103,7 @@ from fashion_size.types import (
 
 
 def test_version_is_the_current_release():
-    assert __version__ == "2026.11.13.1"
+    assert __version__ == "2026.11.19"
 
 
 def test_readme_brand_chart_example():
@@ -124,7 +124,25 @@ def test_readme_brand_chart_example():
     assert "AU values match US" in mens.source_notes
     assert {"uk": 7, "eu": 40, "us": 9, "au": 9} in chart.rows
     assert chart.covers(ProductType.SHOES)
+    assert chart.covers(ProductType.BOOTS)
+    assert chart.covers(ProductType.TRAINERS)
     assert not chart.covers(ProductType.JEANS)
+    trainers = chart_for(
+        "Dune London",
+        "adult-shoe",
+        "adult",
+        "male",
+        product_type=ProductType.TRAINERS,
+    )
+    boots = chart_for(
+        "Dune London",
+        "adult-shoe",
+        "adult",
+        "female",
+        product_type=ProductType.BOOTS,
+    )
+    assert trainers is mens
+    assert boots is chart
 
 
 def test_readme_dress_conversion():
@@ -744,6 +762,29 @@ def test_brand_name_selects_the_shipped_chart():
     assert dune.source.kind == ConversionSourceKind.BRAND
     assert dune.source.brand_chart is not None
     assert dune.source.brand_chart.brand_name == BrandName.DUNE_LONDON
+    # Dune's one footwear table also governs boots and trainers.
+    men = Demographic("adult", "male")
+    for product_type in (ProductType.SHOES, ProductType.BOOTS, ProductType.TRAINERS):
+        mens_eu = Size.from_raw(6, UK_ADULT_SHOE_SIZE).convert_to_locale(
+            "eu",
+            demographic=men,
+            brand_name="Dune London",
+            product_type=product_type,
+        )
+        assert mens_eu.raw == 40
+        assert mens_eu.source.kind == ConversionSourceKind.BRAND
+        womens_uk = Size.from_raw(40, EU_ADULT_SHOE_SIZE).convert_to_locale(
+            "uk",
+            demographic=adult_female,
+            brand_name="Dune London",
+            product_type=product_type,
+        )
+        assert womens_uk.raw == 7
+        assert womens_uk.source.kind == ConversionSourceKind.BRAND
+    default_trainer = Size.from_raw(40, EU_ADULT_SHOE_SIZE).convert_to_locale(
+        "uk", demographic=men
+    )
+    assert default_trainer.raw == Decimal("6.5")
 
     anthropologie = shoe.convert_to_locale(
         "eu",
@@ -803,6 +844,70 @@ def test_brand_name_selects_the_shipped_chart():
             demographic=adult_female,
             product_type=ProductType.SHOES,
         )
+
+
+def test_shared_footwear_charts_cover_boots_and_trainers():
+    shoe_charts = [
+        chart
+        for chart in load_brand_charts()
+        if chart.size_type in {"adult-shoe", "kids-shoe"}
+    ]
+    assert shoe_charts
+    shared = (ProductType.SHOES, ProductType.BOOTS, ProductType.TRAINERS)
+    for chart in shoe_charts:
+        if chart.brand_name == BrandName.SALT_WATER_SANDALS:
+            assert chart.product_types == (ProductType.SHOES,)
+            continue
+        assert chart.product_types == shared
+
+
+@pytest.mark.parametrize(
+    ("brand", "gender", "uk", "eu"),
+    [
+        ("Esska", "female", 7, 40),
+        ("Mallet", "female", 7, 40),
+        ("Mallet", "male", 6, 40),
+        ("Only The Blind", "male", 7, Decimal("40.5")),
+        ("Penelope Chilvers", "female", 7, 40),
+        ("Penelope Chilvers", "male", 7, 40),
+        ("Urban Outfitters", "female", 7, 40),
+        ("Urban Outfitters", "male", 7, Decimal("40.5")),
+    ],
+)
+def test_shared_footwear_chart_converts_boots_and_trainers(brand, gender, uk, eu):
+    demographic = Demographic("adult", gender)
+    for product_type in (ProductType.BOOTS, ProductType.TRAINERS):
+        converted = Size.from_raw(uk, UK_ADULT_SHOE_SIZE).convert_to_locale(
+            "eu",
+            demographic=demographic,
+            brand_name=brand,
+            product_type=product_type,
+        )
+        assert converted.raw == eu
+        assert converted.source.kind == ConversionSourceKind.BRAND
+        assert converted.source.brand_chart is not None
+        assert converted.source.brand_chart.brand_name == brand
+
+
+def test_salt_water_sandal_chart_stays_shoes_only():
+    women = Demographic("adult", "female")
+    trainers = Size.from_raw(7, UK_ADULT_SHOE_SIZE).convert_to_locale(
+        "eu",
+        demographic=women,
+        brand_name="Salt-Water Sandals",
+        product_type=ProductType.TRAINERS,
+    )
+    assert trainers.raw == 41
+    assert trainers.source.kind == ConversionSourceKind.DEFAULT
+    assert trainers.source.default_reason == DefaultChartReason.NO_MATCHING_CHART
+    shoes = Size.from_raw(7, UK_ADULT_SHOE_SIZE).convert_to_locale(
+        "eu",
+        demographic=women,
+        brand_name="Salt-Water Sandals",
+        product_type=ProductType.SHOES,
+    )
+    assert shoes.raw == 40
+    assert shoes.source.kind == ConversionSourceKind.BRAND
 
 
 def test_shipped_brand_charts_are_complete():

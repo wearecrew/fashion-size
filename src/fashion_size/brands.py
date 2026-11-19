@@ -91,6 +91,15 @@ class Brand:
         return bool(self.charts)
 
 
+# One published footwear table covers shoes, boots, and trainers.
+# Salt-Water charts stay shoes-only: they are sandal tables.
+_FOOTWEAR: tuple[ProductType, ...] = (
+    ProductType.SHOES,
+    ProductType.BOOTS,
+    ProductType.TRAINERS,
+)
+
+
 BRANDS: tuple[Brand, ...] = (
     Brand(BrandName.ANTHROPOLOGIE),
     Brand(
@@ -101,7 +110,7 @@ BRANDS: tuple[Brand, ...] = (
                 size_type="adult-shoe",
                 age_group="adult",
                 gender="female",
-                product_types=(ProductType.SHOES,),
+                product_types=_FOOTWEAR,
                 updated_at=datetime(2026, 3, 29, tzinfo=UTC),
                 effective_from=datetime(2026, 3, 29, tzinfo=UTC),
             ),
@@ -110,7 +119,7 @@ BRANDS: tuple[Brand, ...] = (
                 size_type="adult-shoe",
                 age_group="adult",
                 gender="male",
-                product_types=(ProductType.SHOES,),
+                product_types=_FOOTWEAR,
                 updated_at=datetime(2026, 3, 29, tzinfo=UTC),
                 effective_from=datetime(2026, 3, 29, tzinfo=UTC),
             ),
@@ -125,7 +134,7 @@ BRANDS: tuple[Brand, ...] = (
                 size_type="adult-shoe",
                 age_group="adult",
                 gender="female",
-                product_types=(ProductType.SHOES,),
+                product_types=_FOOTWEAR,
                 updated_at=datetime(2026, 3, 29, tzinfo=UTC),
                 effective_from=datetime(2026, 3, 29, tzinfo=UTC),
             ),
@@ -147,7 +156,7 @@ BRANDS: tuple[Brand, ...] = (
                 size_type="adult-shoe",
                 age_group="adult",
                 gender="male",
-                product_types=(ProductType.SHOES,),
+                product_types=_FOOTWEAR,
                 updated_at=datetime(2026, 3, 29, tzinfo=UTC),
                 effective_from=datetime(2026, 3, 29, tzinfo=UTC),
             ),
@@ -156,7 +165,7 @@ BRANDS: tuple[Brand, ...] = (
                 size_type="adult-shoe",
                 age_group="adult",
                 gender="female",
-                product_types=(ProductType.SHOES,),
+                product_types=_FOOTWEAR,
                 updated_at=datetime(2026, 3, 29, tzinfo=UTC),
                 effective_from=datetime(2026, 3, 29, tzinfo=UTC),
             ),
@@ -174,7 +183,7 @@ BRANDS: tuple[Brand, ...] = (
                 size_type="adult-shoe",
                 age_group="adult",
                 gender="male",
-                product_types=(ProductType.SHOES,),
+                product_types=_FOOTWEAR,
                 updated_at=datetime(2026, 3, 29, tzinfo=UTC),
                 effective_from=datetime(2026, 3, 29, tzinfo=UTC),
             ),
@@ -190,7 +199,7 @@ BRANDS: tuple[Brand, ...] = (
                 size_type="adult-shoe",
                 age_group="adult",
                 gender="female",
-                product_types=(ProductType.SHOES,),
+                product_types=_FOOTWEAR,
                 updated_at=datetime(2026, 3, 29, tzinfo=UTC),
                 effective_from=datetime(2026, 3, 29, tzinfo=UTC),
             ),
@@ -199,7 +208,7 @@ BRANDS: tuple[Brand, ...] = (
                 size_type="adult-shoe",
                 age_group="adult",
                 gender="male",
-                product_types=(ProductType.SHOES,),
+                product_types=_FOOTWEAR,
                 updated_at=datetime(2026, 3, 29, tzinfo=UTC),
                 effective_from=datetime(2026, 3, 29, tzinfo=UTC),
             ),
@@ -266,7 +275,7 @@ BRANDS: tuple[Brand, ...] = (
                 size_type="adult-shoe",
                 age_group="adult",
                 gender="female",
-                product_types=(ProductType.SHOES,),
+                product_types=_FOOTWEAR,
                 updated_at=datetime(2026, 3, 29, tzinfo=UTC),
                 effective_from=datetime(2026, 3, 29, tzinfo=UTC),
             ),
@@ -275,7 +284,7 @@ BRANDS: tuple[Brand, ...] = (
                 size_type="adult-shoe",
                 age_group="adult",
                 gender="male",
-                product_types=(ProductType.SHOES,),
+                product_types=_FOOTWEAR,
                 updated_at=datetime(2026, 3, 29, tzinfo=UTC),
                 effective_from=datetime(2026, 3, 29, tzinfo=UTC),
             ),

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 2026.11.19
+
+- Adult shoe charts for Dune London, Esska, Mallet, Only The Blind, Penelope Chilvers, and Urban Outfitters cover shoes, boots, and trainers. Each brand publishes one footwear table, so a trainer or boot uses that chart instead of the default shoe chart. Salt-Water Sandals stays shoes-only: those rows are sandal tables.
+
 ## 2026.11.13.1
 
 - `hem-length` formula length size type for fitted-dress hem measurements (`in-hem-length` / `cm-hem-length`, attribute slug `dress-length` also resolves). Bounds 20–42 in; distinct from `trousers-inseam` for the dresses family.
