@@ -785,14 +785,6 @@ def test_brand_name_selects_the_shipped_chart():
         "uk", demographic=men
     )
     assert default_trainer.raw == Decimal("6.5")
-    shoes_only = Size.from_raw(6, UK_ADULT_SHOE_SIZE).convert_to_locale(
-        "eu",
-        demographic=men,
-        brand_name="Mallet",
-        product_type=ProductType.TRAINERS,
-    )
-    assert shoes_only.source.kind == ConversionSourceKind.DEFAULT
-    assert shoes_only.source.default_reason == DefaultChartReason.NO_MATCHING_CHART
 
     anthropologie = shoe.convert_to_locale(
         "eu",
@@ -852,6 +844,70 @@ def test_brand_name_selects_the_shipped_chart():
             demographic=adult_female,
             product_type=ProductType.SHOES,
         )
+
+
+def test_shared_footwear_charts_cover_boots_and_trainers():
+    shoe_charts = [
+        chart
+        for chart in load_brand_charts()
+        if chart.size_type in {"adult-shoe", "kids-shoe"}
+    ]
+    assert shoe_charts
+    shared = (ProductType.SHOES, ProductType.BOOTS, ProductType.TRAINERS)
+    for chart in shoe_charts:
+        if chart.brand_name == BrandName.SALT_WATER_SANDALS:
+            assert chart.product_types == (ProductType.SHOES,)
+            continue
+        assert chart.product_types == shared
+
+
+@pytest.mark.parametrize(
+    ("brand", "gender", "uk", "eu"),
+    [
+        ("Esska", "female", 7, 40),
+        ("Mallet", "female", 7, 40),
+        ("Mallet", "male", 6, 40),
+        ("Only The Blind", "male", 7, Decimal("40.5")),
+        ("Penelope Chilvers", "female", 7, 40),
+        ("Penelope Chilvers", "male", 7, 40),
+        ("Urban Outfitters", "female", 7, 40),
+        ("Urban Outfitters", "male", 7, Decimal("40.5")),
+    ],
+)
+def test_shared_footwear_chart_converts_boots_and_trainers(brand, gender, uk, eu):
+    demographic = Demographic("adult", gender)
+    for product_type in (ProductType.BOOTS, ProductType.TRAINERS):
+        converted = Size.from_raw(uk, UK_ADULT_SHOE_SIZE).convert_to_locale(
+            "eu",
+            demographic=demographic,
+            brand_name=brand,
+            product_type=product_type,
+        )
+        assert converted.raw == eu
+        assert converted.source.kind == ConversionSourceKind.BRAND
+        assert converted.source.brand_chart is not None
+        assert converted.source.brand_chart.brand_name == brand
+
+
+def test_salt_water_sandal_chart_stays_shoes_only():
+    women = Demographic("adult", "female")
+    trainers = Size.from_raw(7, UK_ADULT_SHOE_SIZE).convert_to_locale(
+        "eu",
+        demographic=women,
+        brand_name="Salt-Water Sandals",
+        product_type=ProductType.TRAINERS,
+    )
+    assert trainers.raw == 41
+    assert trainers.source.kind == ConversionSourceKind.DEFAULT
+    assert trainers.source.default_reason == DefaultChartReason.NO_MATCHING_CHART
+    shoes = Size.from_raw(7, UK_ADULT_SHOE_SIZE).convert_to_locale(
+        "eu",
+        demographic=women,
+        brand_name="Salt-Water Sandals",
+        product_type=ProductType.SHOES,
+    )
+    assert shoes.raw == 40
+    assert shoes.source.kind == ConversionSourceKind.BRAND
 
 
 def test_shipped_brand_charts_are_complete():

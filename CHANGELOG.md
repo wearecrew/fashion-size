@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Dune London's adult shoe charts cover shoes, boots, and trainers. Dune publishes one footwear table (men's UK 6 = EU 40, women's UK 7 = EU 40), so a trainer or boot uses that chart instead of the default shoe chart. Other brands' shoe charts stay shoes-only.
+- Adult shoe charts for Dune London, Esska, Mallet, Only The Blind, Penelope Chilvers, and Urban Outfitters cover shoes, boots, and trainers. Each brand publishes one footwear table, so a trainer or boot uses that chart instead of the default shoe chart. Salt-Water Sandals stays shoes-only: those rows are sandal tables.
 
 ## 2026.11.13.1
 
